@@ -21,7 +21,7 @@ class Board(Frame):
         self.master.title('Frety')
 
         self._padding = 0
-        self._factor =  self._model.Mansur / self._model.Frets[-1]
+        self._factor = self._model.mansur / self._model.fret_positions[-1]
         self._model.resize(self._width * self._factor)
 
         self._canvas = Canvas(self, bg='white', **kwargs)
@@ -44,11 +44,11 @@ class Board(Frame):
         self._canvas.scale('all', 0, 0, wscale, hscale)
 
     def _on_button_1(self, event):
-        fret = [i for i, distance in enumerate(self._model.Frets) if event.x < distance + self._padding][0]
-        string = (event.y - self._padding) // ((self._height - self._padding * 2) / len(self._model.Strings))
+        fret = [i for i, distance in enumerate(self._model.fret_positions) if event.x < distance + self._padding][0]
+        string = (event.y - self._padding) // ((self._height - self._padding * 2) / len(self._model.string_thickness))
 
-        fret = int(min(max(0, fret), len(self._model.Frets) - 1))
-        string = int(min(max(0, string), len(self._model.Strings) - 1))
+        fret = int(min(max(0, fret), len(self._model.fret_positions) - 1))
+        string = int(min(max(0, string), len(self._model.string_thickness) - 1))
 
         self.note_selected(string, fret)
 
@@ -68,16 +68,16 @@ class Board(Frame):
             self._height,
             width=8, fill='gray', capstyle=ROUND, joinstyle=ROUND)
 
-        for fret in range(0, len(self._model.Frets)):
+        for fret in range(0, len(self._model.fret_positions)):
             self._canvas.create_line(
-                self._padding + self._model.Frets[fret],
+                self._padding + self._model.fret_positions[fret],
                 self._padding,
-                self._padding + self._model.Frets[fret],
+                self._padding + self._model.fret_positions[fret],
                 self._height - self._padding,
                 width=8, fill='gray', capstyle=ROUND, joinstyle=ROUND)
 
-        space = (self._height - (self._padding * 2)) // len(self._model.Strings)
-        for i, thickness in enumerate(self._model.Strings):
+        space = (self._height - (self._padding * 2)) // len(self._model.string_thickness)
+        for i, thickness in enumerate(self._model.string_thickness):
             self._canvas.create_line(
                 0,
                 self._padding + (i + .5) * space,

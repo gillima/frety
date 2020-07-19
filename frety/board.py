@@ -1,33 +1,35 @@
 class Board:
     NOTES = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#']
 
-    def __init__(self, count=12, length=628, strings=None):
-        self._fret_count = count
+    def __init__(self, frets=12, length=628, strings=None):
+        self._fret_count = frets
         self._mansur = length
-        self._strings = strings or [('E', 1), ('B', 2), ('G', 3), ('D', 4), ('A', 5), ('E', 6)]
+        self._strings = strings or [('e', 1), ('b', 2), ('G', 3), ('D', 4), ('A,', 5), ('E,,', 6)]
         self._positions = None
         self.resize(length)
 
     @property
-    def Frets(self):
+    def fret_count(self):
+        return self._fret_count
+
+    @property
+    def fret_positions(self):
         return self._positions
 
     @property
-    def Strings(self):
+    def string_thickness(self):
         return [thickness for note, thickness in self._strings]
 
     @property
-    def Mansur(self):
+    def string_notes(self):
+        return [note for note, thickness in self._strings]
+
+    @property
+    def mansur(self):
         return self._mansur
 
     def resize(self, length):
         self._positions = list(self._calculate_frets(length))
-
-
-    def note(self, string, fret):
-        note_pos = Board.NOTES.index(self._strings[string][0])
-        note_pos = (note_pos + fret) % len(Board.NOTES)
-        return Board.NOTES[note_pos]
 
     def _calculate_frets(self, length):
         position = 0
