@@ -78,10 +78,10 @@ class FretBoard(Frame):
             self._height,
             width=8, fill=FretBoard.FRET_COLOR, capstyle=ROUND, joinstyle=ROUND)
 
-        for i in [f for f in (3, 5, 7, 9, 12) if f < len(self._model.fret_positions)]:
+        for i, c in self._model.markers:
             pos = (self._model.fret_positions[i - 1] + self._model.fret_positions[i]) / 2
             radius = (self._padding / 3)
-            if i != 12:
+            if c == 1:
                 self._canvas.create_oval(
                     self._padding + pos - radius,
                     self._height / 2 - radius,

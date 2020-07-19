@@ -28,6 +28,16 @@ class Board:
     def mansur(self):
         return self._mansur
 
+    @property
+    def markers(self):
+        for i in range(1, self._fret_count):
+            if i % 12 == 0:
+                yield i, 2
+            if i % 12 < 2 or 12 - i % 12 < 2 or i % 2 == 0:
+                continue
+            yield i, 1
+
+
     def resize(self, length):
         self._positions = list(self._calculate_frets(length))
 
