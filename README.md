@@ -1,2 +1,3 @@
-# frety
-Python application to learn note positions on the guitar fretboard
+# Frety
+
+Python application to learn note positions on the guitar fretboard.
