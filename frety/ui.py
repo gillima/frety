@@ -6,14 +6,17 @@ class Window(Frame):
         super().__init__(root, *args, **kwargs)
         self._model = model
 
-        question = Label(root, text='A', font='-size 30')
-        question.pack()
+        self._question = Label(root, text='A', font='-size 30')
+        self._question.pack()
 
         self._board = FretBoard(model, root, *args, **kwargs)
         self.pack(fill=BOTH, expand=YES)
 
         self.note_selected = lambda *a, **kw: None
         self._board.note_selected = lambda *a, **kw: self.note_selected(*a, **kw)
+
+    def ask_for_note(self, note):
+        self._question.configure(text=note)
 
 
 class FretBoard(Frame):

@@ -5,14 +5,12 @@ from frety import Controller, Board, Window
 
 
 def main():
-    AbcPlus()
-
     root = Tk()
     board = Board()
     ui = Window(board, root)
 
     controller = Controller(ui, board)
-    controller.prepare()
+    controller.next()
 
     root.geometry('1020x330')
     root.mainloop()
