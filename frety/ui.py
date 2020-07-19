@@ -1,17 +1,26 @@
-from tkinter import Frame, BOTH, Canvas, ROUND, YES
+from tkinter import Frame, BOTH, Canvas, ROUND, YES, Label
+
 
 class Window(Frame):
-    def __init__(self, model, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, model, root, *args, **kwargs):
+        super().__init__(root, *args, **kwargs)
         self._model = model
-        self._board = Board(model, *args, **kwargs)
+
+        question = Label(root, text='A', font='-size 30')
+        question.pack()
+
+        self._board = FretBoard(model, root, *args, **kwargs)
         self.pack(fill=BOTH, expand=YES)
 
         self.note_selected = lambda *a, **kw: None
         self._board.note_selected = lambda *a, **kw: self.note_selected(*a, **kw)
 
 
-class Board(Frame):
+class FretBoard(Frame):
+    FRET_COLOR = 'gray'
+    MARKER_COLOR = 'lightgray'
+    STRING_COLOR = 'black'
+
     def __init__(self, model, *args, **kwargs):
         self._model = model
         self._width = kwargs.pop('width', 1200)
@@ -54,19 +63,44 @@ class Board(Frame):
 
     def _init_board(self):
         self._padding = self._height // 10
+        space = (self._height - (self._padding * 2)) // len(self._model.string_thickness)
 
         self._canvas.create_line(
             self._padding // 2,
             0,
             self._padding,
             self._padding,
-            width=8, fill='gray', capstyle=ROUND, joinstyle=ROUND)
+            width=8, fill=FretBoard.FRET_COLOR, capstyle=ROUND, joinstyle=ROUND)
         self._canvas.create_line(
             self._padding,
             self._height - self._padding,
             self._padding // 2,
             self._height,
-            width=8, fill='gray', capstyle=ROUND, joinstyle=ROUND)
+            width=8, fill=FretBoard.FRET_COLOR, capstyle=ROUND, joinstyle=ROUND)
+
+        for i in [f for f in (3, 5, 7, 9, 12) if f < len(self._model.fret_positions)]:
+            pos = (self._model.fret_positions[i - 1] + self._model.fret_positions[i]) / 2
+            radius = (self._padding / 3)
+            if i != 12:
+                self._canvas.create_oval(
+                    self._padding + pos - radius,
+                    self._height / 2 - radius,
+                    self._padding + pos + radius,
+                    self._height / 2 + radius,
+                    fill=FretBoard.MARKER_COLOR)
+            else:
+                self._canvas.create_oval(
+                    self._padding + pos - radius,
+                    self._height / 2 - space - radius,
+                    self._padding + pos + radius,
+                    self._height / 2 - space + radius,
+                    fill=FretBoard.MARKER_COLOR)
+                self._canvas.create_oval(
+                    self._padding + pos - radius,
+                    self._height / 2 + space - radius,
+                    self._padding + pos + radius,
+                    self._height / 2 + space + radius,
+                    fill=FretBoard.MARKER_COLOR)
 
         for fret in range(0, len(self._model.fret_positions)):
             self._canvas.create_line(
@@ -74,13 +108,12 @@ class Board(Frame):
                 self._padding,
                 self._padding + self._model.fret_positions[fret],
                 self._height - self._padding,
-                width=8, fill='gray', capstyle=ROUND, joinstyle=ROUND)
+                width=8, fill=FretBoard.FRET_COLOR, capstyle=ROUND, joinstyle=ROUND)
 
-        space = (self._height - (self._padding * 2)) // len(self._model.string_thickness)
         for i, thickness in enumerate(self._model.string_thickness):
             self._canvas.create_line(
                 0,
                 self._padding + (i + .5) * space,
                 self._width,
                 self._padding + (i + .5) * space,
-                width=thickness, capstyle=ROUND)
+                width=thickness, fill=FretBoard.STRING_COLOR, capstyle=ROUND)
