@@ -1,22 +1,31 @@
-from tkinter import Frame, BOTH, Canvas, ROUND, YES, Label
+from tkinter import Frame, BOTH, Canvas, ROUND, YES, Label, LEFT, RIGHT, RAISED, X
+
+from frety.utils import CallableCollection
 
 
 class Window(Frame):
-    def __init__(self, model, root, *args, **kwargs):
+    def __init__(self, root, *args, **kwargs):
+        self._model = kwargs.pop('model')
+
         super().__init__(root, *args, **kwargs)
-        self._model = model
+        root.title('Frety')
+        self.pack(fill=BOTH, expand=True)
 
-        self._question = Label(root, text='A', font='-size 30')
-        self._question.pack()
+        frame = Frame(self)
+        frame.pack(fill=X)
+        self._question = Label(frame, text='A', font='-size 30')
+        self._question.pack(side=LEFT)
+        self._selected = Label(frame, text='', font='-size 30')
+        self._selected.pack(side=RIGHT)
 
-        self._board = FretBoard(model, root, *args, **kwargs)
-        self.pack(fill=BOTH, expand=YES)
-
-        self.note_selected = lambda *a, **kw: None
-        self._board.note_selected = lambda *a, **kw: self.note_selected(*a, **kw)
+        self._board = FretBoard(self, *args, **kwargs, model=self._model)
+        self.note_selected = self._board.note_selected
 
     def ask_for_note(self, note):
         self._question.configure(text=note)
+
+    def show_selected(self, note):
+        self._selected.configure(text=note)
 
 
 class FretBoard(Frame):
@@ -24,13 +33,12 @@ class FretBoard(Frame):
     MARKER_COLOR = 'lightgray'
     STRING_COLOR = 'black'
 
-    def __init__(self, model, *args, **kwargs):
-        self._model = model
+    def __init__(self, *args, **kwargs):
+        self._model = kwargs.pop('model')
         self._width = kwargs.pop('width', 1200)
         self._height = kwargs.pop('height', 300)
 
         super().__init__(*args, **kwargs)
-        self.master.title('Frety')
 
         self._padding = 0
         self._factor = self._model.mansur / self._model.fret_positions[-1]
@@ -44,7 +52,7 @@ class FretBoard(Frame):
         self.bind('<Configure>', self._on_configure)
         self._canvas.bind("<Button-1>", self._on_button_1)
 
-        self.note_selected = lambda *a, **kw: None
+        self.note_selected = CallableCollection()
 
     def _on_configure(self, event):
         wscale = float(event.width) / self._width
